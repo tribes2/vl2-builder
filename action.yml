@@ -1,0 +1,70 @@
+name: vl2-builder
+description: Build and release vl2 files for Tribes 2 using GitHub
+author: 'tribes2'
+branding:
+  icon: 'truck'
+  color: 'yellow'
+inputs:
+  # The tag name is required to correctly name the artifact and the release.
+  tag-name:
+    description: 'The tag name that triggered the workflow (e.g., v1.0.0). Usually ${{ github.ref_name }}.'
+    required: true
+    
+  # The full repository slug (owner/repo) is needed to extract the repository name for artifact naming.
+  archive-prefix:
+    description: 'First portion of the final archive name (e.g. DMP-1.0.0.vl2)'
+    required: true
+    
+  # Allows users to specify files or directories to omit from the final vl2.
+  exclude-patterns:
+    description: 'Comma-separated list of glob patterns to exclude from the vl2 archive (e.g., .git/*, *.zip, *.vl2, **/node_modules/*).'
+    required: false
+    default: '.git/*, *.zip, *.vl2, .github/*'
+
+outputs:
+  asset_name:
+    description: 'The file name of the generated vl2 asset (e.g., my-repo-v1.0.0.vl2).'
+    # idk, my bff jill? https://www.youtube.com/watch?v=4nIUcRJX9-o
+    value: ${{ steps.vars.outputs.artifact_name }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+    - name: Create vl2 archive of the entire repository
+      shell: bash
+      run: |
+        # Use the inputs to determine the tag and repo name
+        TAG="${{ inputs.tag-name }}"
+        REPO_NAME="${{ inputs.archive-prefix }}"
+        ARTIFACT_NAME="${REPO_NAME}-${TAG}.vl2"
+        EXCLUDE_PATTERNS="${{ inputs.exclude-patterns }}"
+        
+        echo "Zipping all contents into: $ARTIFACT_NAME"
+        echo "Excluding patterns: $EXCLUDE_PATTERNS"
+        
+        # Convert comma-separated string to 'zip -x "pattern"' arguments
+        EXCLUDE_ARGS=""
+        IFS=',' read -ra PATTERNS <<< "$EXCLUDE_PATTERNS"
+        for P in "${PATTERNS[@]}"; do
+          P_TRIMMED=$(echo "$P" | xargs)
+          if [ -n "$P_TRIMMED" ]; then
+            EXCLUDE_ARGS="$EXCLUDE_ARGS -x \"$P_TRIMMED\""
+          fi
+        done
+        
+        # Execute the zip command using 'eval' to properly handle multiple exclusion arguments
+        eval "zip -0 -r $ARTIFACT_NAME . $EXCLUDE_ARGS"
+
+        # Verify the archive was created
+        ls -lh $ARTIFACT_NAME
+
+    - name: Publish ZIP archive to GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ${{ steps.vars.outputs.artifact_name }}
+        tag_name: ${{ inputs.tag-name }}
+        draft: false
+        prerelease: false
