@@ -7,7 +7,7 @@ branding:
 inputs:
   # The tag name is required to correctly name the artifact and the release.
   tag-name:
-    description: 'The tag name that triggered the workflow (e.g., v1.0.0). Usually ${{ github.ref_name }}.'
+    description: 'The tag name that triggered the workflow (e.g., v1.0.0). Usually github.ref_name.'
     required: true
     
   # The full repository slug (owner/repo) is needed to extract the repository name for artifact naming.
