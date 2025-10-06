@@ -25,7 +25,7 @@ outputs:
   asset_name:
     description: 'The file name of the generated vl2 asset (e.g., my-repo-v1.0.0.vl2).'
     # idk, my bff jill? https://www.youtube.com/watch?v=4nIUcRJX9-o
-    value: ${{ steps.vars.outputs.artifact_name }}
+    value: ${{ steps.archive.outputs.artifact_name }}
 
 runs:
   using: 'composite'
@@ -34,6 +34,7 @@ runs:
       uses: actions/checkout@v4
 
     - name: Create vl2 archive of the entire repository
+      id: 'archive'
       shell: bash
       run: |
         # Use the inputs to determine the tag and repo name
@@ -61,10 +62,13 @@ runs:
         # Verify the archive was created
         ls -lh $ARTIFACT_NAME
 
+        # Make the artifact name available to other steps
+        echo "artifact_name=$ARTIFACT_NAME" >> "$GITHUB_OUTPUT"
+
     - name: Publish ZIP archive to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        files: ${{ steps.vars.outputs.artifact_name }}
+        files: ${{ steps.archive.outputs.artifact_name }}
         tag_name: ${{ inputs.tag-name }}
         draft: false
         prerelease: false
