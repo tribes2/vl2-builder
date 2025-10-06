@@ -30,10 +30,7 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Checkout repository code
-      uses: actions/checkout@v4
-
-    - name: Create vl2 archive of the entire repository
+    - name: Create vl2 archive of the files checked out in previous steps
       id: 'archive'
       shell: bash
       run: |
