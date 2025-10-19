@@ -10,20 +10,19 @@ inputs:
     description: 'The tag name that triggered the workflow (e.g., v1.0.0). Usually github.ref_name.'
     required: true
     
-  # The full repository slug (owner/repo) is needed to extract the repository name for artifact naming.
   archive-prefix:
-    description: 'First portion of the final archive name (e.g. DMP-1.0.0.vl2)'
+    description: 'First portion of the final archive name (e.g. zDMP2)'
     required: true
     
   # Allows users to specify files or directories to omit from the final vl2.
   exclude-patterns:
-    description: 'Comma-separated list of glob patterns to exclude from the vl2 archive (e.g., .git/*, *.zip, *.vl2, **/node_modules/*).'
+    description: 'Comma-separated list of glob patterns to exclude from the vl2 archive (e.g., .git/*, *.zip, *.vl2). Always include *.vl2 or suffer duplicated archives!'
     required: false
     default: '.git/*, *.zip, *.vl2, .github/*'
 
 outputs:
   asset_name:
-    description: 'The file name of the generated vl2 asset (e.g., my-repo-v1.0.0.vl2).'
+    description: 'Glob pattern for generated vl2 asset(s) (e.g., prefix-v1.0.0*.vl2)'
     # idk, my bff jill? https://www.youtube.com/watch?v=4nIUcRJX9-o
     value: ${{ steps.archive.outputs.artifact_name }}
 
@@ -43,7 +42,7 @@ runs:
         echo "Creating vl2: $ARTIFACT_PREFIX"
         echo "Exclude patterns: $EXCLUDE_PATTERNS"
 
-        # Attempt to call file list and split script
+        # Attempt to call autosplit script
         echo "Calling out to autosplit.sh..."
         chmod 700 ${{ github.action_path }}/autosplit.sh
         ${{ github.action_path }}/autosplit.sh "$EXCLUDE_PATTERNS" "$ARTIFACT_PREFIX"
