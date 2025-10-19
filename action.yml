@@ -45,6 +45,7 @@ runs:
 
         # Attempt to call file list and split script
         echo "Calling out to autosplit.sh..."
+        chmod 700 ${{ github.action_path }}/autosplit.sh
         ${{ github.action_path }}/autosplit.sh "$EXCLUDE_PATTERNS" "$ARTIFACT_PREFIX"
 
         ls -lh *.vl2
