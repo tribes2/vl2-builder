@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Prevent globbing patterns from being expanded
+set -f
 # 1.95GiB max size to avoid hitting GitHub and Tribes 2 ceilings
 # Might be too high if GitHub uses GB instead of GiB, let me know
 #SIZE_LIMIT=2093790080
@@ -38,8 +40,11 @@ LIST_FILE_COUNT=1
 FIND_EXCLUDES=()
 IFS=',' read -r -a PATTERNS_ARRAY <<< "$EXCLUSIONS"
 for pattern in "${PATTERNS_ARRAY[@]}"; do
-    FIND_EXCLUDES+=( -not -path "$pattern" )
+    echo "PATTERN: $pattern"
+    FIND_EXCLUDES+=( -not -path "./$pattern" )
 done
+
+echo "exclusions: ${FIND_EXCLUDES[@]}"
 
 next_list() {
     if [[ $LIST_FILE_COUNT -ne 1 ]]; then
@@ -49,7 +54,6 @@ next_list() {
         rm $LIST_FILENAME
     fi
     LIST_FILENAME="file_list_${LIST_FILE_COUNT}.txt"
-    echo "Collecting files for vl2 part $LIST_FILENAME"
     LIST_FILE_COUNT=$((LIST_FILE_COUNT + 1))
     CURRENT_SIZE=0
 }
@@ -64,6 +68,7 @@ while IFS= read -r -d $'\0' file; do
     fi
     if (( CURRENT_SIZE + FILE_SIZE > SIZE_LIMIT )); then
         next_list
+        echo "Collecting files for vl2 part $LIST_FILENAME"
     fi
     echo "$file" >> "$LIST_FILENAME"
     # Update the current size
