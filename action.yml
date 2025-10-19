@@ -34,30 +34,18 @@ runs:
       id: 'archive'
       shell: bash
       run: |
-        echo "listing contents of repository before doing anything else"
-        ls ${{ github.action_path }}/
-        find .
         # Use the inputs to determine the tag and repo name
         TAG="${{ inputs.tag-name }}"
         REPO_NAME="${{ inputs.archive-prefix }}"
-        ARTIFACT_NAME="${REPO_NAME}-${TAG}.vl2"
+        ARTIFACT_PREFIX="${REPO_NAME}-${TAG}"
         EXCLUDE_PATTERNS="${{ inputs.exclude-patterns }}"
         
-        echo "Zipping all contents into: $ARTIFACT_NAME"
-        echo "Excluding patterns: $EXCLUDE_PATTERNS"
-        
-        # Convert comma-separated string to 'zip -x "pattern"' arguments
-        EXCLUDE_ARGS=""
-        IFS=',' read -ra PATTERNS <<< "$EXCLUDE_PATTERNS"
-        for P in "${PATTERNS[@]}"; do
-          P_TRIMMED=$(echo "$P" | xargs)
-          if [ -n "$P_TRIMMED" ]; then
-            EXCLUDE_ARGS="$EXCLUDE_ARGS -x \"$P_TRIMMED\""
-          fi
-        done
-        
-        # Execute the zip command using 'eval' to properly handle multiple exclusion arguments
-        eval "zip -0 -r $ARTIFACT_NAME . $EXCLUDE_ARGS"
+        echo "Creating vl2: $ARTIFACT_PREFIX"
+        echo "Exclude patterns: $EXCLUDE_PATTERNS"
+
+        # Attempt to call file list and split script
+        echo "Calling out to zipper.sh..."
+        ${{ github.action_path }}/autosplit.sh "$EXCLUDE_PATTERNS" "$ARTIFACT_PREFIX"
 
         ls -lh $ARTIFACT_NAME
 
