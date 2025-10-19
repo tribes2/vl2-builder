@@ -34,6 +34,9 @@ runs:
       id: 'archive'
       shell: bash
       run: |
+        echo "listing contents of repository before doing anything else"
+        ls ${{ github.action_path }}/
+        find .
         # Use the inputs to determine the tag and repo name
         TAG="${{ inputs.tag-name }}"
         REPO_NAME="${{ inputs.archive-prefix }}"
@@ -56,13 +59,12 @@ runs:
         # Execute the zip command using 'eval' to properly handle multiple exclusion arguments
         eval "zip -0 -r $ARTIFACT_NAME . $EXCLUDE_ARGS"
 
-        # Verify the archive was created
         ls -lh $ARTIFACT_NAME
 
         # Make the artifact name available to other steps
         echo "artifact_name=$ARTIFACT_NAME" >> "$GITHUB_OUTPUT"
 
-    - name: Publish ZIP archive to GitHub Release
+    - name: Publish vl2 archive to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
         files: ${{ steps.archive.outputs.artifact_name }}
