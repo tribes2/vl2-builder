@@ -44,13 +44,13 @@ runs:
         echo "Exclude patterns: $EXCLUDE_PATTERNS"
 
         # Attempt to call file list and split script
-        echo "Calling out to zipper.sh..."
+        echo "Calling out to autosplit.sh..."
         ${{ github.action_path }}/autosplit.sh "$EXCLUDE_PATTERNS" "$ARTIFACT_PREFIX"
 
-        ls -lh $ARTIFACT_NAME
+        ls -lh *.vl2
 
-        # Make the artifact name available to other steps
-        echo "artifact_name=$ARTIFACT_NAME" >> "$GITHUB_OUTPUT"
+        # Make the artifact prefix available to other steps
+        echo "artifact_name=${ARTIFACT_PREFIX}*.vl2" >> "$GITHUB_OUTPUT"
 
     - name: Publish vl2 archive to GitHub Release
       uses: softprops/action-gh-release@v2
