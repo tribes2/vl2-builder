@@ -16,7 +16,7 @@ inputs:
     
   # Allows users to specify files or directories to omit from the final vl2.
   exclude-patterns:
-    description: 'Comma-separated list of glob patterns to exclude from the vl2 archive (e.g., .git/*, *.zip, *.vl2). Always include *.vl2 or suffer duplicated archives!'
+    description: 'Comma and space separated list of glob patterns to exclude from the vl2 archive (e.g., .git/*, *.zip, *.vl2). Always include spaces and *.vl2 or suffer!'
     required: false
     default: '.git/*, *.zip, *.vl2, .github/*'
 

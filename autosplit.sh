@@ -38,9 +38,8 @@ CURRENT_SIZE=0
 LIST_FILE_COUNT=1
 
 FIND_EXCLUDES=()
-IFS=',' read -r -a PATTERNS_ARRAY <<< "$EXCLUSIONS"
+IFS=', ' read -r -a PATTERNS_ARRAY <<< "$EXCLUSIONS"
 for pattern in "${PATTERNS_ARRAY[@]}"; do
-    echo "PATTERN: $pattern"
     FIND_EXCLUDES+=( -not -path "./$pattern" )
 done
 
