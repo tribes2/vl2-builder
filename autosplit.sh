@@ -2,7 +2,9 @@
 
 # 1.95GiB max size to avoid hitting GitHub and Tribes 2 ceilings
 # Might be too high if GitHub uses GB instead of GiB, let me know
-SIZE_LIMIT=2093790080
+#SIZE_LIMIT=2093790080
+# test partitioning
+SIZE_LIMIT=52428800
 
 EXCLUSIONS="$1"
 ARTIFACT_PREFIX="$2"
