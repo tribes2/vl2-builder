@@ -56,7 +56,7 @@ next_list() {
 
 next_list
 
-find . -type f -print0 | while IFS= read -r -d $'\0' file; do
+find . "${FIND_EXCLUDES[@]}" -type f -print0 | while IFS= read -r -d $'\0' file; do
     FILE_SIZE=$(stat -c%s "$file" 2>/dev/null)
     if [ -z "$FILE_SIZE" ]; then
         echo "Warning: Could not get size for file: $file. Skipping."
